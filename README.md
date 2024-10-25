@@ -1,224 +1,136 @@
-# Personal Expense Tracker
+# Admit Spot
 
-Personal Expense Tracker is a financial management application that allows users to track transactions, categorize them, and generate summaries of their financial activities. This project is built with Node.js, Express, and PostgreSQL.
+Admit Spot is a Node.js backend application built using Express, providing user authentication, contact management, and other features with JWT-based security and request validation. The application structure follows a modular pattern, making it easy to add features or modify existing ones.
 
 ## Table of Contents
 
-- [Features](#features)
-- [Technologies](#technologies)
-- [Setup](#setup)
-- [API Endpoints](#api-endpoints)
-  - [Categories](#categories)
-  - [Transactions](#transactions)
-  - [Summary](#summary)
-- [Sample Responses](#sample-responses)
+- [Installation](#installation)
+- [Environment Variables](#environment-variables)
+- [Usage](#usage)
+- [Project Structure](#project-structure)
+- [Available Routes](#available-routes)
+- [Technologies Used](#technologies-used)
+- [Contributing](#contributing)
 - [License](#license)
 
-## Features
+---
 
-- Add, update, delete, and retrieve categories and transactions.
-- Categorize transactions as income or expense.
-- Retrieve a summary of transactions, including total income, total expenses, and balance.
-- Filter summaries by date range or category.
+## Installation
 
-## Technologies
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/Vigneshkumar-D/admit-spot.git
+    cd admit-spot
+    ```
 
-- Node.js
-- Express
-- PostgreSQL
-- Sequelize ORM
-- Swagger (for API documentation)
+2. **Install dependencies**:
+    ```bash
+    npm install
+    ```
 
-## Setup
+3. **Configure environment variables**: Rename `.env.example` to `.env` and fill in the values as per your setup (see [Environment Variables](#environment-variables)).
 
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/floww.ai.git
-   ```
+4. **Start the server**:
+    ```bash
+    node src/app.js
+    ```
+    or for development with auto-reload:
+    ```bash
+    npm run dev
+    ```
 
-2. Navigate into the project directory:
-   ```bash
-   cd floww.ai
-   ```
+## Environment Variables
 
-3. Install the required dependencies:
-   ```bash
-   npm install
-   ```
+Create a `.env` file in the root directory to configure the following variables:
 
-4. Create a `.env` file in the root directory and configure your database connection:
-   ```
-   DB_HOST=localhost
-   DB_USER=your_username
-   DB_PASSWORD=your_password
-   DB_NAME=floww_ai
-   ```
+- `PORT`: Port number for the server.
+- `DB_URI`: Database connection string.
+- `JWT_SECRET`: Secret key for JWT signing.
+- `RATE_LIMIT_WINDOW`: Time window for rate limiting (in ms).
+- `RATE_LIMIT_MAX`: Max number of requests per window.
 
-5. Run the application:
-   ```bash
-   npm start
-   ```
+Example:
 
-6. Access the API documentation through Swagger UI at `http://localhost:3000/api-docs`.
+```plaintext
+DB_NAME=product
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=localhost
+DB_PORT=5432
+DB_DIALECT=postgres  
+JWT_SECRET=qwertyujkjhgfdsdfghj432345678!@#$%^
+JWT_EXPIRES_IN=1h
+EMAIL_HOST=smtp.gmail.com  
+EMAIL_PORT=587            
+EMAIL_USER=
+EMAIL_PASS=
+```
 
-## API Endpoints
+## Usage
 
-### Categories
+To start using the application, access the available routes (detailed below) through a REST client such as Postman or by implementing frontend requests to this API.
 
-#### 1. Create a Category
-- **Endpoint**: `POST /api/categories`
-- **Description**: Add a new category.
-- **Request Body**:
-  ```json
-  {
-    "name": "Groceries",
-    "type": "expense"
-  }
-  ```
+## Project Structure
 
-#### 2. Get All Categories
-- **Endpoint**: `GET /api/categories`
-- **Description**: Retrieve all categories.
+```plaintext
+admit-spot/
+├── src/
+│   ├── app.js                 # Main application file
+│   ├── config/                # Configuration files
+│   ├── controllers/           # Route controller functions
+│   ├── middlewares/           # Middleware functions
+│   ├── models/                # Database models
+│   ├── routes/                # API routes
+│   ├── validations/           # Validation schemas
+├── .env.example               # Environment variables example
+├── package.json
+└── README.md
+```
 
-#### 3. Get Category by ID
-- **Endpoint**: `GET /api/categories/:id`
-- **Description**: Retrieve a category by its ID.
+## Available Routes
 
-#### 4. Update a Category
-- **Endpoint**: `PUT /api/categories/:id`
-- **Description**: Update an existing category.
-- **Request Body**:
-  ```json
-  {
-    "name": "Food & Beverages",
-    "type": "expense"
-  }
-  ```
+### Authentication
 
-#### 5. Delete a Category
-- **Endpoint**: `DELETE /api/categories/:id`
-- **Description**: Delete a category by its ID.
+- **POST /auth/register** - Register a new user
+- **POST /auth/login** - Log in a user and receive a JWT token
+- **GET /auth/verify-email/:token** - Verify user’s email
+- **POST /auth/request-password-reset** - Request a password reset email
+- **POST /auth/reset-password/:token** - Reset user password
 
-### Transactions
+### Contacts
 
-#### 1. Create a Transaction
-- **Endpoint**: `POST /api/transactions`
-- **Description**: Add a new transaction.
-- **Request Body**:
-  ```json
-  {
-    "type": "income",
-    "categoryId": 1,
-    "amount": 100.00,
-    "date": "2023-10-22T10:00:00Z",
-    "description": "Freelance work"
-  }
-  ```
+Protected routes (require authentication token):
+- **POST /contacts/** - Create a new contact
+- **GET /contacts/** - Retrieve all contacts
+- **GET /contacts/:id** - Retrieve a contact by ID
+- **PUT /contacts/:id** - Update a contact by ID
+- **DELETE /contacts/:id** - Delete a contact by ID
+- **POST /contacts/batch** - Batch process contacts
 
-#### 2. Get All Transactions
-- **Endpoint**: `GET /api/transactions`
-- **Description**: Retrieve all transactions.
+## Technologies Used
 
-#### 3. Get Transaction by ID
-- **Endpoint**: `GET /api/transactions/:id`
-- **Description**: Retrieve a transaction by its ID.
+- **Node.js**
+- **Express.js**
+- **MongoDB (or other DB based on DB_URI)**
+- **JWT** - JSON Web Tokens for authentication
+- **Joi** - Data validation
+- **Rate Limiting** - Middleware for request rate limiting
+- **dotenv** - For environment variable management
 
-#### 4. Update a Transaction
-- **Endpoint**: `PUT /api/transactions/:id`
-- **Description**: Update an existing transaction.
-- **Request Body**:
-  ```json
-  {
-    "type": "expense",
-    "categoryId": 2,
-    "amount": 50.00,
-    "date": "2023-10-20T10:00:00Z",
-    "description": "Grocery shopping"
-  }
-  ```
+## Contributing
 
-#### 5. Delete a Transaction
-- **Endpoint**: `DELETE /api/transactions/:id`
-- **Description**: Delete a transaction by its ID.
+Contributions are welcome! Please fork this repository, make your changes, and submit a pull request.
 
-### Summary
+1. Fork the project
+2. Create your feature branch (`git checkout -b feature/YourFeature`)
+3. Commit your changes (`git commit -m 'Add your message'`)
+4. Push to the branch (`git push origin feature/YourFeature`)
+5. Open a Pull Request
 
-#### Get Summary of Transactions
-- **Endpoint**: `GET /api/summary`
-- **Description**: Retrieve a summary of transactions, such as total income, total expenses, and balance. Optionally, this can be filtered by date range or category.
+## License
 
-## Sample Responses
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.
 
-### Create a Category
-- **Response**:
-  ```json
-  {
-    "id": 1,
-    "name": "Groceries",
-    "type": "expense",
-    "createdAt": "2023-10-22T10:00:00Z",
-    "updatedAt": "2023-10-22T10:00:00Z"
-  }
-  ```
+--- 
 
-### Get All Categories
-- **Response**:
-  ```json
-  [
-    {
-      "id": 1,
-      "name": "Groceries",
-      "type": "expense",
-      "createdAt": "2023-10-22T10:00:00Z",
-      "updatedAt": "2023-10-22T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "name": "Salary",
-      "type": "income",
-      "createdAt": "2023-10-22T10:00:00Z",
-      "updatedAt": "2023-10-22T10:00:00Z"
-    }
-  ]
-  ```
-
-### Get All Transactions
-- **Response**:
-  ```json
-  [
-    {
-      "id": 1,
-      "type": "income",
-      "categoryId": 1,
-      "amount": 100.00,
-      "date": "2023-10-22T10:00:00Z",
-      "description": "Freelance work",
-      "createdAt": "2023-10-22T10:00:00Z",
-      "updatedAt": "2023-10-22T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "type": "expense",
-      "categoryId": 2,
-      "amount": 50.00,
-      "date": "2023-10-20T10:00:00Z",
-      "description": "Grocery shopping",
-      "createdAt": "2023-10-20T10:00:00Z",
-      "updatedAt": "2023-10-20T10:00:00Z"
-    }
-  ]
-  ```
-
-### Summary Response
-- **Response**:
-  ```json
-  {
-    "totalIncome": 100.00,
-    "totalExpenses": 50.00,
-    "balance": 50.00
-  }
-  ```
-
-  ### API Screenshot
-  ![alt text](<Screenshot (60).png>)
-
+Feel free to adjust or expand upon this template based on your project's specific details!
